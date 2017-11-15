@@ -31,6 +31,7 @@
 #include "../control/oor_control.h"
 #include "../control/oor_ctrl_device.h"
 #include "../control/lisp_ms.h"
+#include "../control/lisp_mr.h"
 #include "../control/lisp_xtr.h"
 #include "../data-plane/data-plane.h"
 #include "../lib/oor_log.h"
@@ -801,6 +802,42 @@ configure_ms(cfg_t *cfg)
 }
 
 int
+configure_mr(cfg_t *cfg)
+{
+    lisp_mr_t *mr;
+    char *iface_name;
+    iface_t *iface=NULL;
+
+    /* create and configure xtr */
+    if (ctrl_dev_create(MR_MODE, &ctrl_dev) != GOOD) {
+        OOR_LOG(LCRIT, "Failed to create MR. Aborting!");
+        exit_cleanup();
+    }
+    mr = CONTAINER_OF(ctrl_dev, lisp_mr_t, super);
+
+    /* CONTROL INTERFACE */
+    /* TODO: should work with all interfaces in the future */
+    iface_name = cfg_getstr(cfg, "control-iface");
+    if (iface_name) {
+        iface = add_interface(iface_name);
+        if (iface == NULL) {
+            OOR_LOG(LERR, "Configuration file: Couldn't add the control iface of the Map Resolver");
+            return(BAD);
+        }
+    }else{
+    /* we have no iface_name, so also iface is missing */
+        OOR_LOG(LERR, "Configuration file: Specify the control iface of the Map Resolver");
+        return(BAD);
+    }
+
+    iface_configure (iface, AF_INET);
+    iface_configure (iface, AF_INET6);
+
+    return(GOOD);
+}
+
+
+int
 handle_config_file()
 {
     int ret;
@@ -1018,6 +1055,8 @@ handle_config_file()
             ret=configure_rtr(cfg);
         }else if (strcmp(mode, "MN") == 0) {
             ret=configure_mn(cfg);
+        }else if (strcmp(mode, "MR") == 0) {
+            ret=configure_mr(cfg);
         }else{
             OOR_LOG (LCRIT, "Configuration file: Unknown operating mode: %s",mode);
             cfg_free(cfg);

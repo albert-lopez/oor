@@ -61,6 +61,7 @@ OBJS        = cmdline.o                  \
           control/oor_local_db.o         \
           control/oor_map_cache.o        \
           control/lisp_xtr.o             \
+          control/lisp_mr.o              \
           control/lisp_ms.o              \
           control/control-data-plane/control-data-plane.o    \
           control/control-data-plane/tun/cdp_tun.o           \

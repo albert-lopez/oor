@@ -24,11 +24,12 @@
 #include "oor_ctrl_device.h"
 
 
-static ctrl_dev_class_t *reg_ctrl_dev_cls[4] = {
+static ctrl_dev_class_t *reg_ctrl_dev_cls[5] = {
         &xtr_ctrl_class,
         &ms_ctrl_class,
         &xtr_ctrl_class,/* RTR */
         &xtr_ctrl_class,/* MN */
+        &mr_ctrl_class
 };
 
 inline oor_dev_type_e
@@ -158,6 +159,9 @@ ctrl_dev_type_to_char(oor_dev_type_e type)
         break;
     case MN_MODE:
         strcpy(device,"Mobile Node");
+        break;
+    case MR_MODE:
+        strcpy(device,"Map resolver");
         break;
     default:
         strcpy(device,"Unknown");
